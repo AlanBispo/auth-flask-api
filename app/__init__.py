@@ -3,6 +3,8 @@ from flask import Flask
 from dotenv import load_dotenv
 from app.extensions import db, migrate, ma
 from app.blueprints import register_blueprints
+from flask import jsonify
+from app.exceptions.custom_exceptions import AppError
 
 load_dotenv()
 
@@ -17,5 +19,15 @@ def create_app():
     ma.init_app(app)
     
     register_blueprints(app)
+
+    @app.errorhandler(AppError)
+    def handle_custom_errors(error):
+        response = jsonify({"error": error.message})
+        response.status_code = error.status_code
+        return response
+
+    @app.errorhandler(Exception)
+    def handle_generic_errors(error):
+        return jsonify({"error": "Erro interno no servidor",}), 500
 
     return app
