@@ -4,19 +4,19 @@ from app.extensions import db
 
 class UserRepository:
 
-    def create(self, username: str, email: str, password_hash: str) -> UserModel:
+    def create(self, username: str, email: str, password: str) -> UserModel:
         """
         Cria um novo usuário no banco de dados.
 
         Args:
             username (str): O nome de usuário escolhido.
             email (str): O endereço de e-mail único do usuário.
-            password_hash (str): A senha já criptografada (hash).
+            password (str): A senha já criptografada (hash).
 
         Returns:
             UserModel: A instância do usuário recém-criada com o ID gerado pelo banco.
         """
-        user = UserModel(username=username, email=email, password_hash=password_hash)
+        user = UserModel(username=username, email=email, password=password)
         db.session.add(user)
         db.session.commit()
         return user
