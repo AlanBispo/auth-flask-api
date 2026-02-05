@@ -57,3 +57,12 @@ class UserService:
             user.password = generate_password_hash(data['password'])
 
         return self.repository.save_update(user)
+    
+    def delete_user(self, user_id: int) -> dict:
+        user = self.repository.find_by_id(user_id)
+        if not user:
+            raise UserNotFoundError()
+            
+        self.repository.delete(user)
+        
+        return user_id

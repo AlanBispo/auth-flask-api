@@ -59,3 +59,8 @@ class UserRepository:
         db.session.add(user)
         db.session.commit()
         return user
+    
+    def delete(self, user: UserModel) -> None:
+        """ Remove um usuário do banco de dados. """
+        db.session.delete(user)
+        db.session.commit()

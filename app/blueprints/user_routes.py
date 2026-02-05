@@ -35,3 +35,12 @@ def update_user(user_id):
     updated_user = user_service.update_user(user_id, data)
     
     return user_schema.jsonify(updated_user), 200
+
+@user_bp.route('/user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    deleted_id = user_service.delete_user(user_id)
+
+    return jsonify({
+        "message": f"Usuário {deleted_id} removido com sucesso.",
+        "id": deleted_id
+    }), 200
