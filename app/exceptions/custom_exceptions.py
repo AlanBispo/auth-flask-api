@@ -16,3 +16,7 @@ class UserNotFoundError(AppError):
 class CustomValidationError(AppError):
     def __init__(self, messages):
         super().__init__(messages, 400)
+
+class UnauthorizedError(AppError):
+    def __init__(self, message="Credenciais inválidas."):
+        super().__init__(message, 401)

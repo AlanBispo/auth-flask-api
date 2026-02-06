@@ -22,6 +22,7 @@ services:
       - .:/app
     environment:
       - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
     depends_on:
       - db
 

@@ -3,14 +3,17 @@ from flask import Flask
 from dotenv import load_dotenv
 from app.extensions import db, migrate, ma
 from app.blueprints import register_blueprints
+from app.hooks import register_hooks
 from flask import jsonify
 from app.exceptions.custom_exceptions import AppError
+from werkzeug.exceptions import HTTPException
 
 load_dotenv()
 
 def create_app():
     app = Flask(__name__)
     
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -18,6 +21,7 @@ def create_app():
     migrate.init_app(app, db)
     ma.init_app(app)
     
+    register_hooks(app)
     register_blueprints(app)
 
     @app.errorhandler(AppError)
@@ -26,15 +30,16 @@ def create_app():
 
     @app.errorhandler(Exception)
     def handle_generic_errors(error):
-        app.logger.error(f"Erro Crítico: {str(error)}", exc_info=True)
-        
-        response = {
-            "error": "Erro interno no servidor",
-            "message": str(error)
-        }
-        if not app.debug:
-            response.pop("message")
+        if isinstance(error, HTTPException):
+            return jsonify({
+                "error": error.name,
+                "message": error.description
+            }), error.code
 
+        app.logger.error(f"Erro Crítico: {str(error)}", exc_info=True)
+        response = {"error": "Erro interno no servidor"}
+        if app.debug:
+            response["message"] = str(error)
         return jsonify(response), 500
 
     return app
