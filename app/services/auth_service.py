@@ -4,10 +4,14 @@ from flask import current_app
 from werkzeug.security import check_password_hash
 from app.repositories.user_repository import UserRepository
 from app.exceptions.custom_exceptions import UnauthorizedError
+from app.models.refresh_token_model import RefreshTokenModel
+from app.extensions import db
+from app.repositories.refresh_token_repository import RefreshTokenRepository
 
 class AuthService:
     def __init__(self):
         self.user_repository = UserRepository()
+        self.token_repository = RefreshTokenRepository()
 
     def generate_token(self, user_id, token_type="access"):
         """
@@ -33,26 +37,39 @@ class AuthService:
         if not user or not check_password_hash(user.password, password):
             raise UnauthorizedError()
 
+        access_token = self.generate_token(user.id, "access")
+        refresh_token_str = self.generate_token(user.id, "refresh")
+
+        self.token_repository.create({
+            "token": refresh_token_str,
+            "user_id": user.id,
+            "expires_at": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)
+        })
+
         return {
-            "access_token": self.generate_token(user.id, "access"),
-            "refresh_token": self.generate_token(user.id, "refresh"),
-            "token_type": "Bearer"
+            "access_token": access_token,
+            "refresh_token": refresh_token_str
         }
 
-    def refresh_access_token(self, refresh_token):
-        """Valida o refresh token e gera um novo access token."""
+    def refresh_access_token(self, refresh_token_str):
+        token_record = self.token_repository.find_by_token(refresh_token_str)
+    
+        if not token_record:
+            raise UnauthorizedError("Sessão inválida.")
+
         try:
-            payload = jwt.decode(refresh_token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+            payload = jwt.decode(refresh_token_str, current_app.config['SECRET_KEY'], algorithms=["HS256"])
             
             if payload.get("type") != "refresh":
-                raise UnauthorizedError("Token inválido para esta operação.")
+                raise UnauthorizedError("Tipo de token inválido.")
 
-            user_id = payload['sub']
-            
-            new_access_token = self.generate_token(user_id, "access")
-            return {"access_token": new_access_token}
+            # novo Access Token
+            new_access = self.generate_token(payload['sub'], "access")
+            return {"access_token": new_access}
 
         except jwt.ExpiredSignatureError:
+            # limpa o banco
+            self.token_repository.delete(token_record)
             raise UnauthorizedError("Sessão expirada. Faça login novamente.")
         except jwt.InvalidTokenError:
-            raise UnauthorizedError("Refresh token inválido.")
+            raise UnauthorizedError("Token corrompido.")
