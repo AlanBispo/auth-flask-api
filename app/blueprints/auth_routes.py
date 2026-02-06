@@ -26,3 +26,14 @@ def refresh():
     result = auth_service.refresh_access_token(data['refresh_token'])
     
     return jsonify(result), 200
+
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    data = request.get_json()
+    
+    if not data or 'refresh_token' not in data:
+        return jsonify({"error": "O refresh_token é obrigatório para o logout."}), 400
+
+    result = auth_service.logout(data['refresh_token'])
+    
+    return jsonify(result), 200

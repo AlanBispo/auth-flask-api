@@ -73,3 +73,14 @@ class AuthService:
             raise UnauthorizedError("Sessão expirada. Faça login novamente.")
         except jwt.InvalidTokenError:
             raise UnauthorizedError("Token corrompido.")
+        
+    def logout(self, refresh_token):
+        """
+        Revoga o acesso do usuário removendo o refresh token do banco.
+        """
+        result = self.token_repository.delete_by_token(refresh_token)
+        
+        if not result:
+            raise UnauthorizedError("Sessão já é inválida ou o token não existe.")
+            
+        return {"message": "Logout realizado com sucesso."}

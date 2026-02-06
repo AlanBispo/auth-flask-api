@@ -22,3 +22,12 @@ class RefreshTokenRepository:
         db.session.delete(token_record)
         db.session.commit()
         return True
+    
+    def delete_by_token(self, token_str):
+        """Remove um token"""
+        token = self.find_by_token(token_str)
+        if token:
+            db.session.delete(token)
+            db.session.commit()
+            return True
+        return False
