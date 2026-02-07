@@ -6,7 +6,7 @@ def register_hooks(app):
     
     @app.before_request
     def check_authentication():
-        public_endpoints = ['auth.login', 'user.create_user', 'static']
+        public_endpoints = ['auth.login', 'users.create_user', 'static']
 
         if not request.endpoint or request.endpoint in public_endpoints:
             return
