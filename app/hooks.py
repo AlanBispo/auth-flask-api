@@ -8,6 +8,9 @@ def register_hooks(app):
     def check_authentication():
         public_endpoints = ['auth.login', 'users.create_user', 'static']
 
+        if request.method == 'OPTIONS':
+            return
+        
         if not request.endpoint or request.endpoint in public_endpoints:
             return
 
