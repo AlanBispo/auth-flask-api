@@ -4,7 +4,7 @@
 ![Flask](https://img.shields.io/badge/Flask-2.0+-green?style=for-the-badge&logo=flask&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue?style=for-the-badge&logo=docker&logoColor=white)
 
-Uma API RESTful robusta para gerenciamento de usuários e autenticação, construída com Python e Flask. Este projeto serve como o back-end para o [React Auth Dashboard](LINK_DO_SEU_REPO_FRONTEND_AQUI).
+API RESTful para gerenciamento de usuários e autenticação, construída com Python e Flask. Este projeto serve como o back-end para o [React Auth Dashboard](https://github.com/AlanBispo/react-auth-dashboard).
 
 ## 🚀 Tecnologias
 
