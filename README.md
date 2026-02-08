@@ -25,7 +25,7 @@ API RESTful para gerenciamento de usuários e autenticação, construída com Py
 
 ## ⚙️ Como Rodar (Com Docker)
 
-1. Clone o repositório para sua máquina:
+1. Clone o repositório para sua máquina.
 2. Configure as Variáveis de Ambiente: Crie um arquivo .env na raiz e adicione:
    ```
        DATABASE_URL=mysql+pymysql://user:password@db:3306/flaskdb
