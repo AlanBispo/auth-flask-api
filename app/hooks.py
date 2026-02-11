@@ -1,6 +1,7 @@
 import jwt
 from flask import request, jsonify, current_app, g
 from app.models.user_model import UserModel
+from app.extensions import db
 
 def register_hooks(app):
     
@@ -33,7 +34,7 @@ def register_hooks(app):
                 print("DEBUG: Erro - Tentativa de usar Refresh Token como Access")
                 return jsonify({"error": "Token inválido para esta operação."}), 403
 
-            user = UserModel.query.get(payload['sub'])
+            user = db.session.get(UserModel, payload['sub'])
             if not user:
                 print(f"DEBUG: Usuário ID {payload['sub']} não encontrado no banco")
                 return jsonify({"error": "Usuário não encontrado."}), 401
