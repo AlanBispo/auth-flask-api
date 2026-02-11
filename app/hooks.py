@@ -7,13 +7,19 @@ def register_hooks(app):
     
     @app.before_request
     def check_authentication():
-        public_endpoints = ['auth.login', 'users.create_user', 'auth.refresh', 'static']
+        #public_endpoints = ['auth.login', 'users.create_user', 'auth.refresh', 'static']
 
         if request.method == 'OPTIONS':
-            return
+            return None
         
-        if not request.endpoint or request.endpoint in public_endpoints:
-            return
+        path = request.path.rstrip('/')
+        if path.endswith('/'):
+             path = path[:-1]
+             
+        public_paths = ['/auth/login', '/users', '/auth/refresh']
+        
+        if any(path.startswith(p) for p in public_paths) or request.endpoint == 'static':
+            return None
 
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith("Bearer "):

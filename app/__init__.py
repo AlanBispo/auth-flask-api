@@ -26,15 +26,19 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_TOKEN_LOCATION'] = ['headers']
     # CORS
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    CORS(app, resources={r"/*": {
+        "origins": ["https://react-auth-dashboard-kappa.vercel.app", "http://localhost:5173"],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }}, supports_credentials=True)
 
     db.init_app(app)
     migrate.init_app(app, db)
     ma.init_app(app)
     jwt.init_app(app)
     
-    register_hooks(app)
     register_blueprints(app)
+    register_hooks(app)
 
     @app.errorhandler(AppError)
     def handle_custom_errors(error):
