@@ -16,3 +16,5 @@ PyJWT>=2.8.0
 Flask-Cors
 Flask-JWT-Extended
 pytest
+
+gunicorn
